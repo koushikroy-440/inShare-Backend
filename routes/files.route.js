@@ -52,4 +52,38 @@ router.post('/', (req, res) => {
 
 });
 
+router.post('/send', async (req, res) => {
+    const { uuid, emailTo, emailFrom } = req.body;
+    if (!uuid || !emailTo || !emailFrom) {
+        return res.status(422).send({ error: 'All fields are required' });
+    }
+
+    //*get data from database
+    const file = await File.findOne({ uuid: uuid });
+    if (file.sender) {
+        return res.status(422).send({ error: 'Email already send' });
+    }
+
+    file.sender = emailFrom;
+    file.receiver = emailTo;
+    const response = file.save();
+
+    //*send email
+    const sendMail = require('../services/mail.service');
+    sendMail({
+        from: emailFrom,
+        to: emailTo,
+        subject: 'inShare file sharing',
+        text: `${emailFrom} shared a file with you.`,
+        html: require('../services/emailTemplate.service')({
+            emailFrom,
+            downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}?source=email`,
+            size: parseInt(file.size / 1000) + ' KB',
+            expires: '24 hours'
+        })
+    })
+
+});
+
+
 module.exports = router;
