@@ -15,6 +15,7 @@ dbService();
 //* import routes
 const filesRouter = require('./routes/files.route');
 const showRouter = require('./routes/show.route');
+const downloadRouter = require('./routes/download.route');
 
 //* view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/files', filesRouter);
 app.use('/files', showRouter);
+app.use('/files/download', downloadRouter);
 
 //* catch 404 and forward to error handler
 app.use(function (req, res, next) {
