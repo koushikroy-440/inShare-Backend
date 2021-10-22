@@ -81,7 +81,8 @@ router.post('/send', async (req, res) => {
             size: parseInt(file.size / 1000) + ' KB',
             expires: '24 hours'
         })
-    })
+    });
+    return res.send({ success: true });
 
 });
 
